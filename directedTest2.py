@@ -65,10 +65,12 @@ def topology():
     sta5.setIP('11.0.0.5/8', intf='sta5-wlan1')
     sta6.setIP('11.0.0.6/8', intf='sta6-wlan1')
     sta7.setIP('11.0.0.7/8', intf='sta7-wlan1')
+    # ctr.cmdPrint('python controlscript.py &')
 
     t=threading.Thread(target=threadStart)
     t.start()
-
+    # x=threading.Thread(target=receivePackets)
+    # x.start()
     # print(net.iperf(hosts='sta1,sta2'))
 
     c0.start()
@@ -87,8 +89,9 @@ def threadStart():
     while(True):
         time.sleep(10)
         neighDiscover()
-        ctrl=ControlPlane.receivePackets()
+        # ctrl=ControlPlane.receivePackets()
         print(".....thread end line")
+        time.sleep(10)
 
 
 def neighDiscover():
@@ -125,7 +128,7 @@ def neighDiscover():
         # print(stan1)netdev
 
 
-        sendLinkStateInfo()
+        sendFromNodes()
         # del stan1
         print("........neighDiscover completed\n")
         # for y in range(0,len(sta1Nlist)-1):
@@ -136,15 +139,14 @@ def neighDiscover():
         # print(sta2nn)
 
 
-def sendLinkStateInfo():
+def sendFromNodes():
     "send link information to the controller"
-    #scapy use garnenrm rm
-    p=ControlPlane(RemoteController)
-    p.receivePackets()
+    #using scapy
 
     print("***sending LinkState information")
 
     sta1.cmdPrint('python packetSenderToCtrl.py 1')
+    # receivePackets()
 
     sta2.cmdPrint('python packetSenderToCtrl.py 2')
     sta3.cmdPrint('python packetSenderToCtrl.py 3')
@@ -158,21 +160,42 @@ def sendLinkStateInfo():
     print("....packet Sent completed")
 
 
+def receivePackets():
+    "opens ports for listening in controller and other nodes"
+    ctr.cmdPrint('python controlscript.py')
+
+def computation():
+    "checks the file and computes the best route"
+    pass
+def recvInNodes():
+    """receive computed tables by nodes
+        for now it is just the neighbor/ip table without computation
+    """
+    sta1.cmdPrint('python node_receive.py 1')
+    sta2.cmdPrint('python node_receive.py 2')
+    sta3.cmdPrint('python node_receive.py 3')
+    sta4.cmdPrint('python node_receive.py 4')
+    sta5.cmdPrint('python node_receive.py 5')
+    sta6.cmdPrint('python node_receive.py 6')
+    sta7.cmdPrint('python node_receive.py 7')
+
+def setTable():
 
 
 class ControlPlane(RemoteController):
-    def checkListening( self ):
-        "overridden to do nothing"
+    def checkListening(self):
+
         return
 
-    def receivePackets(self):
-        x=ctr.cmdPrint('python controlscript.py')
-        print(x)
 
-    def sendPackets( self):
-        pass
-    def computation(self):
-        pass
+    # def receivePackets(self):
+    #     x=ctr.cmdPrint('python controlscript.py')
+    #     print(x)
+    #
+    # def sendPackets( self):
+    #     pass
+    # def computation(self):
+    #     pass
 
 
 # class CustomControl(Controller):

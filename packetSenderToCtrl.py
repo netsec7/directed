@@ -17,6 +17,7 @@ def sendPkt():
         print(x)
         pkt=IP(dst="10.0.0.254", src=SA)/TCP()/x
         send(pkt)
+        time.sleep(3)
 
     # print(pkt)            #this line created issue when invoked as sta1.cmd() but runned well using xterm
         print("..... packet send end ")
